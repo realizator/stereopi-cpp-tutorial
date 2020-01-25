@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С tutorial scripts, and has been
+// This file is part of StereoPi С++ tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -42,7 +42,8 @@ int main()
     int total_photos = 50;//            # Number of images to take
     int countdown = 3;//                 # Interval for count-down timer, seconds
     int font = cv::FONT_HERSHEY_SIMPLEX;// # Cowntdown timer font
-    std::string folder_name = "/home/pi/stereopi-c-tutorial/";     
+    std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";    
+     
     //Camera settimgs
     int cam_width = 1280;//            # Cam sensor width settings
     int cam_height = 480;//              # Cam sensor height settings
