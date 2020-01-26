@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С++ tutorial scripts, and has been
+// This file is part of StereoPi С tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -46,7 +46,7 @@ int SpklWinSze = 100;
 float actualFPS = 0.0;
 
 // Global settings
-std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";
+std::string folder_name = "home/pi/stereopi-cpp-tutorial/"";
 std::string calibration_data_folder = folder_name + "calibration_data/"; 
 
 long long getTimestamp() {
@@ -80,11 +80,6 @@ void loadParams()
 bool stereo_depth_map(cv::Mat &left, cv::Mat &right, cv::Ptr<cv::StereoBM> bm,
 		      float &time1, float &time2, float &time3, float &time4)
 {
-
-
-    // cv::cvtColor(left, left, cv::COLOR_BGR2GRAY);
-    // cv::cvtColor(right, right, cv::COLOR_BGR2GRAY);
-
     cv::Mat disp, disp8, colored;
     long long startT = getTimestamp();
     bm->compute( left, right, disp);
@@ -170,8 +165,6 @@ int main()
     float  time1 = 0, time2 = 0, time3 = 0, time4 = 0, time5 = 0, time6 = 0, time7 = 0, time8 = 0, time9 = 0, time10 = 0, time11 = 0;
     int frameNumber = 0;
     
-    // while ((count = fread(buf, sizeof(*buf), bufLen, fp)) != 0)
-    // {
     while (true)
     {
         fseek(fp, -bufLen, SEEK_END);
@@ -206,7 +199,7 @@ int main()
 	time4 += timeShow - timeRectify;
 
 	
-		// Taking a strip from our image for lidar-like mode (and saving CPU)
+	// Taking a strip from our image for lidar-like mode (and saving CPU)
         // cv::Mat imgLCut = cv::Mat(left, cv::Rect(0, 80, left.cols, 80));
         // cv::Mat imgRCut = cv::Mat(right, cv::Rect(0, 80, right.cols, 80));
 

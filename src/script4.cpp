@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С++ tutorial scripts, and has been
+// This file is part of StereoPi С tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -52,12 +52,10 @@ void calibrate_one_camera(std::vector<std::vector<cv::Vec3f> > objpoints, std::v
     int N_OK = (int)objpoints.size();
     cv::Size DIM(img_width, img_height);
 
-    cv::Mat K;// = cv::Mat::zeros(3, 3, CV_32FC1);
-    cv::Mat D;// = cv::Mat::zeros(4, 1, CV_32FC1);
+    cv::Mat K;
+    cv::Mat D;
 
     cv::Vec3f pt(0, 0, 0);
-    //    std::vector<cv::Vec3f> rvecs(N_OK, pt);
-    //    std::vector<cv::Vec3f> tvecs(N_OK, pt);
     cv::Mat rvecs = cv::Mat::zeros(N_OK, 1, CV_32FC3);
     cv::Mat tvecs = cv::Mat::zeros(N_OK, 1, CV_32FC3);
 
@@ -164,6 +162,22 @@ bool calibrate_stereo_cameras(int res_x = img_width, int res_y = img_height)
 
 int main()
 {
+    // Check if calibration data folder exists.
+  DIR *dir = opendir(calibration_data_folder.c_str());
+    if (dir)
+    {
+        closedir(calibration_data_folder);
+    }
+    else
+    {
+      int res = mkdir(calibration_data_folder.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+        if (res == -1)
+        {
+       	   fprintf(stderr, "Cannot create calibration data folder!\n");
+ 	   return 1;
+        }
+    }  
+   
     // Global variables preset
     int total_photos = 50;
 

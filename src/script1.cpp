@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С++ tutorial scripts, and has been
+// This file is part of StereoPi С tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -34,14 +34,12 @@ long long getTimestamp()
     return  epoch.count();
 }
 
-std::string folder_name = "/home/pi/stereopi-cpp-tutorial/"; 
-
 int main()
 {
     fprintf(stderr, "You can press 'Q' to quit this script.\n");
   
-    int imgWidth = 1280;
-    int imgHeight = 480;
+    int imgHeight = 240;
+    int imgWidth = 640;
 
     fprintf(stderr, "Camera resolution: %d x %d\n", imgWidth, imgHeight);
 
@@ -60,6 +58,7 @@ int main()
     long long totalTime = 0;
     while (true)
     {
+        long long frameStartTime = getTimestamp();
         fseek(fp, -bufLen, SEEK_END);
         count = fread(buf, sizeof(*buf), bufLen, fp);
         if (count == 0)
@@ -67,17 +66,21 @@ int main()
         cv::Mat frame(imgHeight, imgWidth, CV_8UC1, buf);
         cv::imshow("video", frame);
         framesNumber++;
+
+	long long frameTime = getTimestamp() - frameStartTime;
+	totalTime += frameTime;
 	
         char k = cv::waitKey(1);
         if (k == 'q' || k == 'Q')
         {
-            cv::imwrite(folder_name + "frame.jpg", frame);
+            cv::imwrite("frame.jpg", frame);
             break;
         }
     }
-    totalTime = getTimestamp();
-    float avgFPS = (totalTime -startTime)/ 1000 / framesNumber;
-    fprintf(stderr, "Average FPS: %f\n", 1000 / avgFPS);
+    //float fps = (float)( 1000000 * framesNumber) / (getTimestamp() - startTime);
+    float avgTime = totalTime / 1000 / framesNumber;
+    fprintf(stderr, "Average time between frames: %f ms\n", avgTime); 
+    fprintf(stderr, "Average FPS: %f\n", 1000 / avgTime);
     return 0;
 }
 
