@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С tutorial scripts, and has been
+// This file is part of StereoPi С++ tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -32,6 +32,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 int SWS = 7;
 int PFS = 7;
@@ -42,7 +43,16 @@ int TxtrThrshld = 13;
 int unicRatio = 19;
 int SpcklRng = 0;
 int SpklWinSze = 0;
-
+float min_y = 10000.0;
+float max_y = -10000.0;
+float min_x =  10000.0;
+float max_x = -10000.0;
+float map_zoom_x = 100;
+float map_zoom_y = 100;
+float map_zoom = 50;
+// Comfort and debug flags
+bool auto_zoom = true; //try to fit all points on 2D map display  if true
+bool show_debug = true;	//will show additional info like max and min of X and Y
 // Global settings
 std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";
 std::string calibration_data_folder = folder_name + "calibration_data/";
@@ -143,6 +153,9 @@ int main()
     bm->setSpeckleRange(SpcklRng);
     bm->setDisp12MaxDiff(1);
     
+    // while ((count = fread(buf, sizeof(*buf), bufLen, fp)) != 0)
+    // {
+
     while (true)
     {
         fseek(fp, -bufLen, SEEK_END);
@@ -207,20 +220,41 @@ int main()
         // Put all points to the 2D map
 
         // Change map_zoom to adjust visible range!
-        float map_zoom = 50.0;
-
+	map_zoom_y = (map_height/(max_y-min_y));
+	map_zoom_x = (map_width/(max_x-min_x)); 
+	// prevent manual/autozoom to set extremely small numbers caused by values spike
+	map_zoom_x = std::max(float(10.0), map_zoom_x);
+	map_zoom_y = std::max(float(10.0), map_zoom_y);
+	if (show_debug) 
+	{
+	    fprintf(stderr, "\nX and Y before zoom: \nmax_y = %.2f, min_y = %.2f, max_x = %.2f, min_x = %.2f \n", max_y, min_y, max_x, min_x );
+	    fprintf(stderr, "map_height = %d, map_width = %d, Autozoom: %s, zoom X = %.2f, zoom Y = %.2f\n", map_height, map_width, auto_zoom ? "On" : "Off", map_zoom_x, map_zoom_y );
+	}
         for (int i = 0; i < points.rows; i++)
         {
-	    float cur_x = points.at<cv::Vec3f>(i, 0)[0];
-	    float cur_y = points.at<cv::Vec3f>(i, 0)[1];
+	    float cur_y = -points.at<cv::Vec3f>(i, 0)[0];
+	    float cur_x = points.at<cv::Vec3f>(i, 0)[1];
+	    if (!isinf(cur_y)) 
+	    {
+		min_y = std::min(cur_y, min_y);
+		max_y = std::max(cur_y, max_y);
 
-            int xx = (int)(cur_y * map_zoom) + (int)(map_width/2); // zero point is in the middle of the map
-            int yy = (int)(cur_x * map_zoom) + map_height;     // zero point is at the bottom of the map
+	    }
+	    if (!isinf(cur_x))
+	    {
+		max_x = std::max(cur_x, max_x);
+		min_x = std::min(cur_x, min_x);
+	    }
+            if (!auto_zoom) {map_zoom_x = map_zoom; map_zoom_y = map_zoom;}
+	    
+	    int xx = (int)((cur_x) * map_zoom_x) + (int)(map_width/2); // zero point is in the middle of the map
+            int yy = map_height - (int)((cur_y-min_y) * map_zoom_y);     // zero point is at the bottom of the map
 
 	    // If the point fits on our 2D map - let's draw it!
-            if (yy < map_width && yy >= 0 && xx < map_height && yy >= 0)
+            if (xx < map_width && xx >= 0 && yy < map_height && yy >= 0)
 	      xy_projection.at<uchar>(yy, xx) = maxInColumns.at<uchar>(i, 0);//maximized_line.at<uchar>(i, 0);
         }
+	
         cv::Mat xy_projection_color, max_line_color, disparity_color;
 	cv::applyColorMap(native_disparity, disparity_color, cv::COLORMAP_JET);
         cv::applyColorMap(xy_projection, xy_projection_color, cv::COLORMAP_JET);

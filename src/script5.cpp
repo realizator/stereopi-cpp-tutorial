@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С tutorial scripts, and has been
+// This file is part of StereoPi С++ tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
@@ -46,7 +46,7 @@ int SpcklRng = 15;
 int SpklWinSze = 100;
 
 // Global settings
-std::string folder_name = "home/pi/stereopi-cpp-tutorial/";
+std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";
 std::string calibration_data_folder = folder_name + "calibration_data/"; 
 
 cv::Mat left, right;
@@ -191,8 +191,8 @@ int main()
     cv::createTrackbar("PreFiltCap", "Image", &preFiltCap, 63, onTrackbar);
     cv::createTrackbar("MinDISP", "Image", &minDisp, 100, onMinDisp);
     cv::createTrackbar("NumOfDisp", "Image", &numOfDisp, 256, onTrackbar);
-    cv::createTrackbar("TxtrThrshld", "Image", &TxtrThrshld, 1000, onTrackbar);
-    cv::createTrackbar("UnicRatio", "Image", &unicRatio, 20, onTrackbar);
+    cv::createTrackbar("TxtrThrshld", "Image", &TxtrThrshld, 100, onTrackbar);
+    cv::createTrackbar("UnicRatio", "Image", &unicRatio, 100, onTrackbar);
     cv::createTrackbar("SpcklRng", "Image", &SpcklRng, 40, onTrackbar);
     cv::createTrackbar("SpklWinSze", "Image", &SpklWinSze, 300, onTrackbar);
     
@@ -202,43 +202,42 @@ int main()
     int prevFrameNumber = 0;
     while (true)
     {
-          fseek(fp, -bufLen, SEEK_END);
-          count = fread(buf, sizeof(*buf), bufLen, fp);
-	  if (count == 0)
-	      break;
+        fseek(fp, -bufLen, SEEK_END);
+        count = fread(buf, sizeof(*buf), bufLen, fp);
+        if (count == 0)
+        break;
 
-          cv::Mat img(photo_height, photo_width, CV_8UC1, buf);
+        cv::Mat img(photo_height, photo_width, CV_8UC1, buf);
+        left = cv::Mat(img, cv::Rect(0, 0, image_width, image_height));
+        right = cv::Mat(img, cv::Rect(image_width, 0, image_width, image_height));
 
-          left = cv::Mat(img, cv::Rect(0, 0, image_width, image_height));
-	  right = cv::Mat(img, cv::Rect(image_width, 0, image_width, image_height));
+        // Rectifying left and right images
+        cv::remap(left, left, leftMapX, leftMapY, cv::INTER_LINEAR);
+        cv::remap(right, right, rightMapX, rightMapY, cv::INTER_LINEAR);
 
-	  // Rectifying left and right images
-	  cv::remap(left, left, leftMapX, leftMapY, cv::INTER_LINEAR);
-	  cv::remap(right, right, rightMapX, rightMapY, cv::INTER_LINEAR);
+        stereo_depth_map(left, right);
 
-	  stereo_depth_map(left, right);
+        cv::imshow("Left", left);
+        cv::imshow("Right", right);
 
-	  cv::imshow("Left", left);
-	  cv::imshow("Right", right);
+        char k = cv::waitKey(1);
+        if (k == 's' || k == 'S')
+        {
+            fprintf(stderr, "k = %c\n", k);
+            saveParams();
+        break;
+        }
+        else if (k == 'q' || k == 'Q')
+        break;
 
-	  char k = cv::waitKey(1);
-	  if (k == 's' || k == 'S')
-	  {
-	    fprintf(stderr, "k = %c\n", k);
-	    saveParams();
-	    break;
-	  }
-	  else if (k == 'q' || k == 'Q')
-	    break;
-
-	  frameNumber++;
-	  long long currTime = getTimestamp();
-	  if (currTime - prevTime > 1000000)
-	  {
-	      fprintf(stderr, "FPS: %d\n", frameNumber - prevFrameNumber);
-	      prevFrameNumber = frameNumber;
-	      prevTime = currTime;
-	  }
+        frameNumber++;
+        long long currTime = getTimestamp();
+        if (currTime - prevTime > 1000000)
+        {
+            fprintf(stderr, "FPS: %d\n", frameNumber - prevFrameNumber);
+            prevFrameNumber = frameNumber;
+            prevTime = currTime;
+        }
 	  
     }
     return 0;

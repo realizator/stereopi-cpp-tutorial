@@ -1,7 +1,7 @@
 // Copyright (C) 2019 Eugene a.k.a. Realizator, stereopi.com, virt2real team
-// Ported from Python to C by Konstantin Ozernov on 10/10/2019.
+// Ported from Python to C++ by Konstantin Ozernov on 10/10/2019.
 //
-// This file is part of StereoPi С tutorial scripts, and has been
+// This file is part of StereoPi С++ tutorial scripts, and has been
 // ported from Pyton version (https://github.com/realizator/stereopi-fisheye-robot)
 //
 // StereoPi tutorial is free software: you can redistribute it 
