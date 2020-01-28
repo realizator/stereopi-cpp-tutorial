@@ -283,7 +283,7 @@ int main()
             fprintf(stderr, "Pair No %d ignored, as no chessboard found\n", photo_counter);
             continue;
         }
-        fprintf(stderr, "End cycle\n");
+        //fprintf(stderr, "End cycle\n");
     }
 
     // Let's calibrate each camera, and than calibrate them together
