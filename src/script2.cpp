@@ -35,7 +35,7 @@ long long getTimestamp()
 
 int main()
 { 
-        //User quit oid message
+        //User quit method message
     fprintf(stderr, "You can press 'Q' to quit this script.\n");
 
     //Photo session settings
@@ -46,7 +46,7 @@ int main()
      
     //Camera settimgs
     int cam_width = 1280;//            # Cam sensor width settings
-    int cam_height = 480;//              # Cam sensor height settings
+    int cam_height = 480;//            # Cam sensor height settings
 
     int half_width = 640;
     int half_height = 480;
