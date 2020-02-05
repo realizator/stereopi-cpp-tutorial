@@ -6,5 +6,6 @@ for this article:
 
 https://stereopi.com/blog/opencv-comparing-speed-c-and-python-code-raspberry-pi-stereo-vision
 
-Link to the Raspbian image will be added soon.
+Link to the Raspbian image (Buster, Python and C++ code):
+https://drive.google.com/file/d/1xlkvZMl9gJGm4Gy1oVlGknHywDnvy5gS/view?usp=sharing
 
