@@ -80,4 +80,3 @@ int main()
     fprintf(stderr, "Average FPS: %f\n", 1000 / avgFPS);
     return 0;
 }
-

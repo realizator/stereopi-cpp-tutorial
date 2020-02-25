@@ -24,7 +24,8 @@
 #include <opencv2/imgproc.hpp>
 //#include <stdio.h>
 #include <unistd.h>
-
+#include <dirent.h>
+#include <sys/stat.h>
 
 long long getTimestamp()
 {
@@ -42,8 +43,7 @@ int main()
     int total_photos = 50;//            # Number of images to take
     int countdown = 3;//                 # Interval for count-down timer, seconds
     int font = cv::FONT_HERSHEY_SIMPLEX;// # Cowntdown timer font
-    std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";    
-     
+    std::string folder_name = "/home/pi/stereopi-cpp-tutorial/";     
     //Camera settimgs
     int cam_width = 1280;//            # Cam sensor width settings
     int cam_height = 480;//            # Cam sensor height settings
@@ -76,6 +76,39 @@ int main()
         return 1;
     }
 
+    // Check if needed dirs exist. If do not - try to create them.
+    std::string scenesDir = folder_name + "scenes";
+    std::string pairsDir = folder_name + "pairs";
+    DIR* dir = opendir(scenesDir.c_str());
+    if (dir)
+    {
+	closedir(dir);
+    }
+    else
+    {
+      int res = mkdir(scenesDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if ( res == -1)
+	{
+	    fprintf(stderr, "Cannot create Scenes dir!\n");
+	    return 1;
+	}
+    }
+    dir = opendir(pairsDir.c_str());
+    if (dir)
+    {
+	closedir(dir);
+    }
+    else
+    {
+      int res = mkdir(pairsDir.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	if ( res == -1)
+	{
+	    fprintf(stderr, "Cannot create Pairs dir!\n");
+	    return 1;
+	}
+    }  
+    
+
     int bufLen = cam_width * cam_height;
     char *buf = (char *)malloc(bufLen);
     int count = 0;
@@ -93,6 +126,7 @@ int main()
         count = fread(buf, sizeof(*buf), bufLen, fp);
 	if (count == 0)
 	  break;
+
         cv::Mat frame(cam_height, cam_width, CV_8UC1, buf);
         long long t1 = getTimestamp();
         int cntdwn_timer = countdown - (int)((t1-t2) / 1000000);
